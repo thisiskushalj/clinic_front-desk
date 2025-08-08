@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import axios from 'axios';
+import axios from '@/utils/axios'; // ✅ use the configured axios instance
 import { isLoggedIn } from '@/utils/auth';
 import Navbar from '@/components/Navbar';
 
@@ -19,25 +19,23 @@ export default function QueuePage() {
     }
   }, []);
 
-  // Load doctors and queue
   useEffect(() => {
     if (!token) return;
 
     const fetchData = async () => {
       try {
         const [doctorRes, queueRes] = await Promise.all([
-          axios.get('/api/doctors', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get('/api/queue', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          axios.get('/doctors'),
+          axios.get('/queue'),
         ]);
 
-        setDoctors(doctorRes.data);
-        setPatients(queueRes.data);
+        // ✅ Make sure responses are arrays
+        setDoctors(Array.isArray(doctorRes.data) ? doctorRes.data : []);
+        setPatients(Array.isArray(queueRes.data) ? queueRes.data : []);
       } catch (err) {
         console.error('Failed to load data:', err);
+        setDoctors([]); // fallback to empty array on error
+        setPatients([]);
       }
     };
 
@@ -46,22 +44,16 @@ export default function QueuePage() {
 
   const addPatient = async () => {
     if (!patientName || !doctorName) return;
-
     const newPosition = patients.length + 1;
 
     try {
-      const res = await axios.post(
-        '/api/queue',
-        {
-          patientName,
-          doctorName,
-          position: newPosition,
-          status: 'Waiting',
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.post('/queue', {
+        patientName,
+        doctorName,
+        position: newPosition,
+        status: 'Waiting',
+      });
+
       setPatients([...patients, res.data]);
       setPatientName('');
       setDoctorName('');
@@ -72,14 +64,7 @@ export default function QueuePage() {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await axios.put(
-        `/api/queue/${id}`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
+      await axios.put(`/queue/${id}`, { status: newStatus });
       setPatients((prev) =>
         prev.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
       );
@@ -94,6 +79,7 @@ export default function QueuePage() {
       <div className="min-h-screen bg-gray-100 p-8">
         <h1 className="text-2xl font-bold mb-6 text-blue-600">Queue Management</h1>
 
+        {/* Add Patient */}
         <div className="bg-white p-4 rounded shadow-md mb-6">
           <h2 className="text-xl font-semibold mb-4 text-black">Add Walk-in Patient</h2>
           <input
@@ -123,6 +109,7 @@ export default function QueuePage() {
           </button>
         </div>
 
+        {/* Queue Table */}
         <div className="bg-white p-4 rounded shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-blue-600">Current Queue</h2>
           {patients.length === 0 ? (
