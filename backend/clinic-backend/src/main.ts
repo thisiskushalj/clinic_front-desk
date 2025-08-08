@@ -1,14 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express'; // ✅ FIXED
+
+const server = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
   app.enableCors({
-    origin: true, // ✅ Your deployed frontend URL
-    credentials: true, // ✅ Needed if you're using Authorization headers (like JWT tokens)
+    origin: ['http://localhost:3000', 'https://clinic-front-desk-frontend.vercel.app'], // ✅ allow origins or use array
+    credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 4000);
+  await app.init(); // ✅ no .listen() here
 }
+
 bootstrap();
+
+export default server;
