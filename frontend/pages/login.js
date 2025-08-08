@@ -10,10 +10,10 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:4000/auth/login', {
-        username,
-        password,
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+        { username, password }
+      );
 
       const token = response.data.access_token;
 
