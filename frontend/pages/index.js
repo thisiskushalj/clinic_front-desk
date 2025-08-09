@@ -11,7 +11,7 @@ export default function Dashboard() {
     if (!isLoggedIn()) {
       router.push('/login');
     }
-  }, []);
+  }, [router]);
   const [activeTab, setActiveTab] = useState("overview");
 
   const tabs = [
@@ -88,7 +88,7 @@ export default function Dashboard() {
           {/* Today's Appointments */}
           <div className="bg-[#F1F6FD] p-5 rounded-xl border border-blue-500">
             <div className='flex justify-between'>
-              <h3 className="text-gray-500 font-semibold">Today's Appointments</h3>
+              <h3 className="text-gray-500 font-semibold">Today&apos;s Appointments</h3>
               <Clipboard className='text-blue-500' />
             </div>
             <p className="text-3xl font-bold mt-2 text-gray-700">24</p>
