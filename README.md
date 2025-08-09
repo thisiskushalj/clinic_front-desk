@@ -19,6 +19,7 @@ This is a full-stack clinic management system focusing on queue management, doct
   Database password: ywCn3jKJQs  
   Port number: 3306
 - Frontend is deployed on Vercel and backend on Render. Initial backend connection may take about 30 seconds. Please be patient.
+- The website is partially responsive, with the main focus on queue management and appointment booking functionality. For the best experience, please use a desktop browser.
 - If you encounter common CORS or 500 errors on navigation, reload multiple times as the database might still be loading.
 - The Dashboard page is a placeholder frontend and can be integrated with backend APIs for real-time data in future updates.
 - A dataset of 100 doctors across 10 locations is pre-loaded to simulate realistic data and test queries.
