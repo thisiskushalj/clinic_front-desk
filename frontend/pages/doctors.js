@@ -288,13 +288,13 @@ export default function DoctorsPage() {
                   resetForm();
                   setEditingId(null);
                 }}
-                className="px-4 py-2 rounded border border-gray-400"
+                className="px-4 py-2 rounded border border-gray-400 font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdate}
-                className="px-4 py-2 rounded bg-green-600 text-white"
+                className="px-4 py-2 rounded bg-green-600 font-semibold text-white cursor-pointer"
               >
                 Update Doctor
               </button>
@@ -335,13 +335,13 @@ export default function DoctorsPage() {
                     <td className="border border-gray-300 p-2 space-x-2">
                       <button
                         onClick={() => handleEdit(doc)}
-                        className="bg-yellow-500 px-2 py-1 rounded text-sm text-white cursor-pointer"
+                        className="bg-yellow-500 px-2 py-1 rounded text-sm text-white cursor-pointer font-semibold"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(doc.id)}
-                        className="bg-red-600 px-2 py-1 rounded text-sm text-white cursor-pointer"
+                        className="bg-red-600 px-2 py-1 rounded text-sm text-white cursor-pointer font-semibold"
                       >
                         Delete
                       </button>

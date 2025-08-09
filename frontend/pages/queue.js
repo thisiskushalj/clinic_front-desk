@@ -65,50 +65,39 @@ export default function QueuePage() {
 
   // 🔹 Update status (and refresh queue after)
   const updateStatus = async (id, newStatus) => {
-    // Save old state in case we need to revert
     const prevPatients = [...patients];
 
-    // Optimistically update UI
     setPatients((prev) => {
+      // Find the target patient
+      const target = prev.find(p => p.id === id);
+      if (!target) return prev;
+
       let updated = prev.map((p) =>
-        p.id === id ? { ...p, status: newStatus, position: newStatus === "In Consultation" ? 0 : p.position } : p
+        p.id === id
+          ? { ...p, status: newStatus, position: newStatus === "In Consultation" ? 0 : p.position }
+          : p
       );
 
-      // If newStatus is "In Consultation", shift positions
       if (newStatus === "In Consultation") {
-        const target = prev.find(p => p.id === id);
-        if (target) {
-          updated = updated.map((p) => {
-            if (p.status === "Waiting" && p.position > target.position) {
-              return { ...p, position: p.position - 1 };
-            }
-            return p;
-          });
-        }
+        // Shift down positions of patients with position > target.position
+        updated = updated.map((p) => {
+          if (p.id !== id && p.status === "Waiting" && p.position > target.position) {
+            return { ...p, position: p.position - 1 };
+          }
+          return p;
+        });
       }
 
-      // If newStatus is "Completed", remove from queue display logic
-      if (newStatus === "Completed") {
-        const target = prev.find(p => p.id === id);
-        if (target) {
-          updated = updated.map((p) => {
-            if (p.status === "Waiting" && p.position > target.position) {
-              return { ...p, position: p.position - 1 };
-            }
-            return p;
-          });
-        }
-      }
+      // Do NOT shift positions when status is changed to Completed
+      // So no change here when newStatus === 'Completed'
 
       return updated;
     });
 
     try {
-      // Send update to backend
       await axios.put(`/queue/${id}`, { status: newStatus });
     } catch (err) {
       console.error("Failed to update status:", err);
-      // Rollback on error
       setPatients(prevPatients);
     }
   };
@@ -133,7 +122,7 @@ export default function QueuePage() {
           </div>
           <button
             onClick={clearQueue}
-            className="bg-red-500 text-white font-semibold px-3 rounded hover:bg-red-600 mb-4"
+            className="bg-red-500 text-white font-semibold px-3 rounded hover:bg-red-600 mb-4 cursor-pointer"
           >
             Clear Queue
           </button>
@@ -189,7 +178,7 @@ export default function QueuePage() {
             </select>
             <button
               onClick={addPatient}
-              className="bg-[#0E87CA] text-white font-semibold px-4 py-2 rounded hover:bg-blue-600 w-full md:w-auto whitespace-nowrap"
+              className="bg-[#0E87CA] text-white font-semibold px-4 py-2 rounded w-full md:w-auto whitespace-nowrap cursor-pointer"
             >
               Add to Queue
             </button>
@@ -243,19 +232,19 @@ export default function QueuePage() {
                   <div className="flex gap-2 mt-3 md:mt-0">
                     <button
                       onClick={() => updateStatus(patient.id, 'Waiting')}
-                      className="text-sm bg-yellow-400 px-3 py-1 rounded text-white"
+                      className="text-sm bg-yellow-500 px-3 py-1 rounded text-white font-semibold cursor-pointer"
                     >
                       Waiting
                     </button>
                     <button
                       onClick={() => updateStatus(patient.id, 'In Consultation')}
-                      className="text-sm bg-blue-400 px-3 py-1 rounded text-white"
+                      className="text-sm bg-blue-500 px-3 py-1 rounded text-white font-semibold cursor-pointer"
                     >
                       With Doctor
                     </button>
                     <button
                       onClick={() => updateStatus(patient.id, 'Completed')}
-                      className="text-sm bg-green-500 px-3 py-1 rounded text-white"
+                      className="text-sm bg-green-600 px-3 py-1 rounded text-white font-semibold cursor-pointer"
                     >
                       Complete
                     </button>

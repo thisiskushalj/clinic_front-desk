@@ -294,21 +294,21 @@ export default function AppointmentsPage() {
                         <div className='flex gap-2 items-center'>
                           <button
                             onClick={() => setRescheduleData(appt)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
+                            className="bg-yellow-500 text-white font-semibold px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
                             title="Reschedule"
                           >
                             <RotateCw size={14} /> Reschedule
                           </button>
                           <button
                             onClick={() => handleCancel(appt.id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
+                            className="bg-red-600 text-white font-semibold px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
                             title="Cancel Appointment"
                           >
                             <X size={14} /> Cancel
                           </button>
                           <button
                             onClick={() => handleComplete(appt.id)}
-                            className="bg-[#5AB32E] text-white px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
+                            className="bg-[#5AB32E] text-white font-semibold px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer"
                             title="Mark as Completed"
                           >
                             <CheckCircle size={14} /> Completed
