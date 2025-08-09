@@ -28,41 +28,63 @@ export class QueueService {
 
   async updateStatus(id: number, newStatus: string) {
     const patient = await this.queueRepository.findOne({ where: { id } });
-
     if (!patient) return;
 
     const currentStatus = patient.status;
+    const currentPosition = patient.position;
 
-    // 🔁 If changing from "Waiting" → "In Consultation"
+    // Case 1: Moving Waiting → In Consultation
     if (currentStatus === 'Waiting' && newStatus === 'In Consultation') {
-      const currentPosition = patient.position;
-
-      // Update this patient first
       patient.status = newStatus;
-      patient.position = 0; // Optional: mark as no longer in queue
+      patient.position = 0; // Show as "being attended"
       await this.queueRepository.save(patient);
 
-      // Now shift everyone behind up by 1
-      const behind = await this.queueRepository.find({
-        where: {
-          position: MoreThan(currentPosition),
-          status: 'Waiting',
-        },
-        order: { position: 'ASC' },
-      });
-
-      for (const person of behind) {
-        person.position -= 1;
-        await this.queueRepository.save(person);
-      }
-
-      return { message: 'Status updated and queue reordered' };
+      // Shift everyone behind forward
+      await this.shiftQueuePositions(currentPosition);
+      return { message: 'Moved to consultation, queue updated' };
     }
 
-    // If it's just a normal status update (no effect on queue)
+    // Case 2: Moving In Consultation → Completed
+    if (currentStatus === 'In Consultation' && newStatus === 'Completed') {
+      patient.status = newStatus;
+      await this.queueRepository.save(patient);
+
+      // Automatically assign next waiting patient to "In Consultation"
+      const nextPatient = await this.queueRepository.findOne({
+        where: { position: 1, status: 'Waiting' },
+      });
+
+      if (nextPatient) {
+        nextPatient.status = 'In Consultation';
+        nextPatient.position = 0;
+        await this.queueRepository.save(nextPatient);
+
+        // Shift rest forward
+        await this.shiftQueuePositions(1);
+      }
+
+      return { message: 'Completed and moved next patient in' };
+    }
+
+    // Default: Just update status
     patient.status = newStatus;
     await this.queueRepository.save(patient);
     return { message: 'Status updated' };
+  }
+
+  private async shiftQueuePositions(startFrom: number) {
+    const behind = await this.queueRepository.find({
+      where: {
+        position: MoreThan(startFrom),
+        status: 'Waiting',
+      },
+      order: { position: 'ASC' },
+    });
+
+    for (const person of behind) {
+      person.position -= 1;
+      await this.queueRepository.save(person);
+    }
   }
 
   async remove(id: number) {

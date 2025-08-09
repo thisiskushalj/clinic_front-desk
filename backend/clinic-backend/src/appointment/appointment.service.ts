@@ -7,41 +7,51 @@ import { Appointment } from './appointment.entity';
 export class AppointmentService {
   constructor(
     @InjectRepository(Appointment)
-    private appointmentRepository: Repository<Appointment>,
+    private appointmentRepo: Repository<Appointment>,
   ) {}
 
   create(appointment: Partial<Appointment>) {
-    const newAppointment = this.appointmentRepository.create(appointment);
-    return this.appointmentRepository.save(newAppointment);
+    return this.appointmentRepo.save(appointment);
   }
 
   findAll() {
-    return this.appointmentRepository.find();
+    return this.appointmentRepo.find({
+      // Removed relations: ['doctor'] since no doctor relation exists
+      order: { date: 'ASC', time: 'ASC' },
+    });
   }
 
   findOne(id: number) {
-    return this.appointmentRepository.findOneBy({ id });
+    return this.appointmentRepo.findOne({
+      where: { id },
+      // Removed relations: ['doctor'] since no doctor relation exists
+    });
   }
 
   update(id: number, updateData: Partial<Appointment>) {
-    return this.appointmentRepository.update(id, updateData);
+    return this.appointmentRepo.update(id, updateData);
   }
 
   delete(id: number) {
-    return this.appointmentRepository.delete(id);
+    return this.appointmentRepo.delete(id);
   }
 
-  async search(doctorName?: string, date?: string): Promise<Appointment[]> {
-    const query = this.appointmentRepository.createQueryBuilder('appointment');
+  /**
+   * Search appointments by doctor or patient name
+   */
+  async search(type: string, value: string) {
+    const qb = this.appointmentRepo.createQueryBuilder('appointment');
 
-    if (doctorName) {
-      query.andWhere('appointment.doctorName = :doctorName', { doctorName });
+    if (type === 'doctor') {
+      qb.where('appointment.doctorName ILIKE :name', { name: `%${value}%` });
+    } else if (type === 'patient') {
+      qb.where('appointment.patientName ILIKE :name', { name: `%${value}%` });
+    } else {
+      return [];
     }
 
-    if (date) {
-      query.andWhere('appointment.date = :date', { date });
-    }
+    qb.orderBy('appointment.date', 'ASC').addOrderBy('appointment.time', 'ASC');
 
-    return query.getMany();
+    return qb.getMany();
   }
 }

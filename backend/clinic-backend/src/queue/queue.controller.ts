@@ -20,13 +20,17 @@ export class QueueController {
   }
 
   @Get()
-  findAll() {
-    return this.queueService.findAll();
+  async findAll() {
+    const queue = await this.queueService.findAll();
+    return queue ?? []; // return [] if null or undefined
   }
 
   @Put(':id')
-  updateStatus(@Param('id') id: string, @Body('status') status: string) {
-    return this.queueService.updateStatus(+id, status);
+  updateStatus(
+    @Param('id') id: string,
+    @Body() body: { status: string; position?: number },
+  ) {
+    return this.queueService.updateStatus(+id, body.status);
   }
 
   @Delete(':id')

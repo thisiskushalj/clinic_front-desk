@@ -1,3 +1,4 @@
+// appointment.controller.ts
 import {
   Controller,
   Get,
@@ -8,6 +9,7 @@ import {
   Delete,
   Query,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { Appointment } from './appointment.entity';
@@ -26,13 +28,34 @@ export class AppointmentController {
     return this.appointmentService.findAll();
   }
 
-  // 🔥 Moved this up
+  /**
+   * Search Appointments by Doctor or Patient Name
+   * Query Params:
+   *   type = 'doctor' | 'patient'
+   *   value = search term
+   */
   @Get('search')
-  searchAppointments(
-    @Query('doctorName') doctorName: string,
-    @Query('date') date: string,
+  async searchAppointments(
+    @Query('type') type: string,
+    @Query('value') value: string,
   ) {
-    return this.appointmentService.search(doctorName, date);
+    if (!type || !value) {
+      throw new BadRequestException('Search type and value are required');
+    }
+
+    if (type !== 'doctor' && type !== 'patient') {
+      throw new BadRequestException(
+        "Invalid search type. Must be 'doctor' or 'patient'",
+      );
+    }
+
+    const results = await this.appointmentService.search(type, value);
+
+    if (!results.length) {
+      return []; // let frontend handle "No appointments" message
+    }
+
+    return results;
   }
 
   @Get(':id')
