@@ -30,8 +30,9 @@ This is a full-stack clinic management system focusing on queue management, doct
 
 ## Tech Stack  
 - Next.js (React)  
-- REST API backend (hosted on Render)  
-- Axios for API calls  
+- Nest.js backend (hosted on Render)  
+- Axios for API calls
+- TypeORM for DB connection
 - Tailwind CSS for styling  
 - Lucide Icons for UI icons  
 
@@ -45,7 +46,7 @@ This is a full-stack clinic management system focusing on queue management, doct
 ---
 
 ## Assumptions & Constraints  
-- Authentication is token-based but does not implement OAuth or full JWT validation.  
+- Authentication is token-based using JWT validation.  
 - Data persistence relies on the backend REST API (either mocked or real).  
 - Backend response times may vary, so frontend includes error handling and loading states.  
 
