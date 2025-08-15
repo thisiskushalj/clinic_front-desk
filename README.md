@@ -12,7 +12,8 @@ This is a full-stack clinic management system focusing on queue management, doct
 ## IMPORTANT NOTES
 - The project was built from scratch according to assignment requirements, with all necessary steps taken to ensure smooth functionality.
 - Login Credentials: Username - `admin`, Password - `admin123`
-- Database Credentials: *(For project reviewer use only)*  
+- Database Credentials: *(For project reviewer use only)*
+- THE 1 WEEK FREE TRIAL OF FREESQL HAS EXPIRED ON AUG 15 2025, HENCE THE BACKEND FAILS TO LOAD AND THEREFORE FRONTEND DOESN'T WORK EITHER ON DEPLOYMENT
   Host: sql12.freesqldatabase.com  
   Database name: sql12794205  
   Database user: sql12794205  
